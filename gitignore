@@ -1,0 +1,17 @@
+# PicOS build artifacts
+*.o
+*.elf
+*.hex
+*.map
+*.lst
+*.d
+
+# IDE/editor files
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# GDB
+.gdbinit
