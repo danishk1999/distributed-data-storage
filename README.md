@@ -3,56 +3,63 @@
 **Institution:** MacEwan University  
 **Status:** ✅ Completed
 
-## Overview
-Designed and implemented a distributed data storage system where multiple 
-nodes can communicate, store, retrieve, and delete information records across 
-the network. Each node operates independently while being part of a larger 
-connected node group.
+A PicOS application for the CC1350 wireless microcontroller that implements a 
+distributed data storage system where nodes can discover each other and remotely 
+store, retrieve, and delete records over a wireless network.
 
 ## Features
-- Discover reachable neighbor nodes within the node group
-- Store information records on remote nodes
-- Retrieve information records stored on other nodes
-- Delete information records stored on other nodes
-- Accept and store information records received from other nodes
-- View locally stored information records
-- Delete ALL locally stored information records
+- **Node Discovery** – finds all reachable neighbor nodes in the same group
+- **Create Record** – stores a string record on a remote node
+- **Delete Record** – deletes a record on a remote node by index
+- **Retrieve Record** – fetches a record from a remote node by index
+- **Local Storage** – view and reset records stored on the local node
+- **Configurable** – group ID and node ID can be changed at runtime via UART
 
-## System Architecture
+## Project Structure
+├── app.cc          # Main application source
+├── options.sys     # PicOS build configuration
+└── README.md
+## Hardware
+- Texas Instruments CC1350 wireless microcontroller
+- PicOS real-time operating system
+- UART connection at 9600 baud for user interaction
 
-Node A ←──→ Node B
-↕              ↕
-Node C ←──→ Node D
-Each node can:
+## Message Protocol
+| Type | Value | Description |
+|------|-------|-------------|
+| Discovery Request  | 0 | Broadcast to find neighbors |
+| Discovery Response | 1 | Reply to discovery |
+| Create Record      | 2 | Store a record on a remote node |
+| Delete Record      | 3 | Delete a record on a remote node |
+| Retrieve Record    | 4 | Fetch a record from a remote node |
+| Response           | 5 | ACK/result for types 2–4 |
 
-Discover neighbors
-Store / Retrieve / Delete records
-Accept incoming records from other nodes
+All packets use a 2-byte Network ID prefix (set to 0) and a 2-byte CRC suffix. 
+Max packet size is 250 bytes.
 
-## Technologies Used
-- **C / C++** — Core implementation language
-- **Socket Programming** — Node-to-node communication
-- **Distributed Systems Concepts** — Node discovery, replication, CRUD
-- **File I/O** — Local record storage and management
+## Node Configuration
+Each node has:
+- **Group ID** (2 bytes) – nodes with the same Group ID can communicate
+- **Node ID** (1 byte) – unique ID between 1 and 25
+- **Database** – up to 40 records, each up to 20 bytes, with owner ID and timestamp
 
-## Core Operations
-| Operation | Description |
-|---|---|
-| Discover Nodes | Find all reachable neighbor nodes in the group |
-| Store Remote | Save a record on another node |
-| Retrieve Remote | Fetch a record stored on another node |
-| Delete Remote | Remove a record from another node |
-| Accept Incoming | Receive and store records sent by other nodes |
-| View Local | Display all records stored on current node |
-| Delete All Local | Wipe all locally stored records |
+## Usage
+Connect to the node over UART at 9600 baud. The main menu will appear:
 
-## Key Learnings
-- Distributed systems architecture and design
-- Node discovery and peer-to-peer communication
-- Remote CRUD operations across a network
-- Socket programming for inter-node communication
-- Data consistency in distributed environments
+Group 1 Device #1 (0/40 records)
+(G)roup ID
+(N)ew device ID
+(F)ind neighbors
+(C)reate record on neighbor
+(D)elete record on neighbor
+(R)etrieve record from neighbor
+(S)how local records
+R(e)set local storage
+Selection:
 
-## Note
-This project was developed for academic purposes to demonstrate 
-distributed computing and storage concepts.
+## Building
+Open the project in your PicOS development environment and build targeting 
+the CC1350. The `options.sys` file configures the radio driver.
+
+## Authors
+- Danish Kumar
